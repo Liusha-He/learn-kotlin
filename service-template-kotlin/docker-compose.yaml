@@ -1,0 +1,39 @@
+version: "3"
+
+services:
+  ecommerce-backend:
+    image: ecom-app:2022-10-02
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    ports:
+      - "8888:8888"
+    depends_on:
+      - postgres
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/ecommerce
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+  ecom-db:
+    image: "postgres:12.2"
+    hostname: ecomdb
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
